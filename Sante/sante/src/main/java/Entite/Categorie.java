@@ -19,7 +19,7 @@ public class Categorie {
     }
 
     public Categorie(String name, String description) {
-    }
+    }   
 
     public int getId() {
 
