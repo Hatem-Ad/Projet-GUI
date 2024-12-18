@@ -19,7 +19,7 @@
         </VBox>
     </left>
 
-    <!-- Section centrale pour les cartes -->
+    <!-- Section centrale pour les cartes -->   
     <center>
         <TilePane fx:id="categoriesTilePane" hgap="15" vgap="15" style="-fx-padding: 20;">
             <!-- Les cartes des catégories seront ajoutées ici dynamiquement -->
