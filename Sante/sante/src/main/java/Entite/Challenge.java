@@ -1,5 +1,6 @@
 package Entite;
 
+
 public class Challenge {
     private int id;
     private String name;
