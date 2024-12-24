@@ -1,0 +1,54 @@
+/* Arrière-plan et espacement */
+.root {
+    -fx-background-color: #748CF1; /* Couleur principale */
+    -fx-padding: 20px;
+    -fx-spacing: 20px;
+    -fx-alignment: center;
+}
+
+/* Titre */
+.title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-padding: 10px 0;
+}
+
+/* Champs de texte */
+.text-field {
+    -fx-background-color: white;
+    -fx-border-color: #dddddd;
+    -fx-border-radius: 10px;
+    -fx-padding: 10px;
+    -fx-font-size: 14px;
+    -fx-pref-width: 300px;
+}
+
+/* Boutons */
+.button {
+    -fx-background-color: #748CF1; /* Vert pour les boutons principaux */
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-padding: 10px 20px;
+    -fx-border-radius: 10px;
+}
+
+.button:hover {
+    -fx-background-color: #748CF1; /* Vert foncé au survol */
+    -fx-cursor: hand;
+}
+
+.button.cancel {
+    -fx-background-color: #f44336; /* Rouge pour le bouton d'annulation */
+}
+
+.button.cancel:hover {
+    -fx-background-color: #e53935;
+}
+
+/* Icônes */
+.icon {
+    -fx-fill: white;
+    -fx-font-size: 18px;
+    -fx-padding: 0 5px;
+}

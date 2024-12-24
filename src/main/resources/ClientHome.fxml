@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="Controllers.ClientHome"
-            prefWidth="1200" prefHeight="800" style="-fx-background-color: #F5F5F5;">
+            prefWidth="1000" prefHeight="750" style="-fx-background-color: #F5F5F5;">
 
     <!-- Barre de navigation latérale -->
     <left>
@@ -46,7 +46,7 @@
             </HBox>
 
             <!-- ScrollPane pour les cartes -->
-            <ScrollPane fitToWidth="true" style="-fx-padding: 10;">
+            <ScrollPane layoutX="50" layoutY="60" prefWidth="1500" prefHeight="680" fitToWidth="true" style="-fx-padding: 10;">
                 <TilePane fx:id="cardsTilePane" hgap="20" vgap="20" prefColumns="2" style="-fx-alignment: CENTER;">
                     <!-- Les cartes seront ajoutées dynamiquement ici -->
                 </TilePane>

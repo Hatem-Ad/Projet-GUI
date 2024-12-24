@@ -8,8 +8,35 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ChallengeService implements ChallengeServiceInterface<Challenge>{
     private Connection con = Test.getInstance().getCon();
+
+    public List<Challenge> getChallengesByCategory(String categoryName) throws SQLException {
+        List<Challenge> challenges = new ArrayList<>();
+        String query = "SELECT c.id, c.name, c.description, c.category_id, cat.name AS category_name "
+                + "FROM challenges c "
+                + "JOIN categories cat ON c.category_id = cat.id "
+                + "WHERE cat.name = ?";
+        PreparedStatement statement = con.prepareStatement(query);
+        statement.setString(1, categoryName);
+
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            challenges.add(new Challenge(
+                    resultSet.getInt("id"),                // ID
+                    resultSet.getString("name"),           // Nom
+                    resultSet.getString("description"),    // Description
+                    resultSet.getInt("category_id"),       // ID de catégorie
+                    categoryName                           // Nom de la catégorie (passé à la méthode)
+            ));
+        }
+        return challenges;
+    }
+
 
     // Ajouter un challenge
     public boolean ajouter(Challenge challenge) throws SQLException {
@@ -51,10 +78,11 @@ public class ChallengeService implements ChallengeServiceInterface<Challenge>{
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return new Challenge(
-                            rs.getInt("id"),
-                            rs.getString("name"),
-                            rs.getString("description"),
-                            rs.getInt("category_id")
+                            rs.getInt("id"),                // ID
+                            rs.getString("name"),           // Nom
+                            rs.getString("description"),    // Description
+                            rs.getInt("category_id")       // ID de catégorie
+
                     );
                 }
             }
@@ -119,6 +147,96 @@ public class ChallengeService implements ChallengeServiceInterface<Challenge>{
         }
         return challenges;
     }
+
+    public int countChallengesByCategory(int categoryId) throws SQLException {
+        String query = "SELECT COUNT(*) FROM challenges WHERE category_id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(query)) {
+            preparedStatement.setInt(1, categoryId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        }
+        return 0;
+    }
+    public boolean addParticipation(int userId, int challengeId) throws SQLException {
+        String query = "INSERT INTO participations (user_id, challenge_id, progression) " +
+                "SELECT ?, ?, 0 FROM DUAL WHERE NOT EXISTS (" +
+                "SELECT * FROM participations WHERE user_id = ? AND challenge_id = ?)";
+        try (PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, challengeId);
+            ps.setInt(3, userId);
+            ps.setInt(4, challengeId);
+
+            int rowsInserted = ps.executeUpdate();
+            return rowsInserted > 0;
+        }
+    }
+
+    public int getCategoryIdByName(String categoryName) throws SQLException {
+        String query = "SELECT id FROM categories WHERE name = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(query)) {
+            preparedStatement.setString(1, categoryName);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("id");
+            }
+        }
+        return -1; // -1 signifie que la catégorie n'existe pas
+    }
+
+
+    public int getChallengeCountByCategory(int categoryId) throws SQLException {
+        String query = "SELECT COUNT(*) FROM challenges WHERE category_id = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(query)) {
+            preparedStatement.setInt(1, categoryId); // Utilisation de l'ID, et non du nom
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                int count = resultSet.getInt(1);
+                System.out.println("Nombre de challenges pour la catégorie ID " + categoryId + " : " + count);
+                return count;
+            }
+        }
+        return 0;
+    }
+
+    public List<String> getChallengeCategoriesByUserId(int userId) throws SQLException {
+        List<String> categories = new ArrayList<>();
+        String query = "SELECT DISTINCT cat.name "
+                + "FROM challenges c "
+                + "JOIN categories cat ON c.category_id = cat.id "
+                + "JOIN participations p ON c.id = p.challenge_id "
+                + "WHERE p.user_id = ?";
+
+        try (PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                categories.add(rs.getString("name"));
+            }
+        }
+        return categories;
+    }
+
+    public Challenge getChallengeById(int challengeId) throws SQLException {
+        String sql = "SELECT * FROM challenges WHERE id = ?";
+        try (PreparedStatement statement = con.prepareStatement(sql)) {
+            statement.setInt(1, challengeId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return new Challenge(
+                        resultSet.getInt("id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("description"),
+                        resultSet.getInt("category_id")
+                );
+            } else {
+                return null; // Challenge not found
+            }
+        }
+    }
+
 
    /* // Méthode pour enregistrer une participation dans la base de données
     public boolean ParticiperChallenge(Participation participation) throws SQLException {

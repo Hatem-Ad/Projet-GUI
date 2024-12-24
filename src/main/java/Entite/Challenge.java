@@ -9,6 +9,17 @@ public class Challenge {
     private final StringProperty description;
     private final IntegerProperty categoryId;
 
+    private String categoryName;
+
+    // Constructeur avec tous les champs
+    public Challenge(int id, String name, String description, int categoryId, String categoryName) {
+        this.id = new SimpleIntegerProperty(id);
+        this.name = new SimpleStringProperty(name);
+        this.description = new SimpleStringProperty(description);
+        this.categoryId = new SimpleIntegerProperty(categoryId);
+        this.categoryName = categoryName;
+    }
+
     // Constructeur avec tous les champs
     public Challenge(int id, String name, String description, int categoryId) {
         this.id = new SimpleIntegerProperty(id);
@@ -16,6 +27,8 @@ public class Challenge {
         this.description = new SimpleStringProperty(description);
         this.categoryId = new SimpleIntegerProperty(categoryId);
     }
+
+
 
     // Constructeur sans ID (pour l'ajout de nouveaux challenges)
     public Challenge(String name, String description, int categoryId) {
@@ -74,6 +87,10 @@ public class Challenge {
 
     public void setCategoryId(int categoryId) {
         this.categoryId.set(categoryId);
+    }
+
+    public String getCategoryName() {
+        return categoryName;
     }
 }
 

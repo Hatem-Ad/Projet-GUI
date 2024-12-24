@@ -3,12 +3,17 @@ package Controllers;
 import Entite.Categorie;
 import Service.CategorieService;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -103,31 +108,27 @@ public class ClientHome {
         VBox card = new VBox(17);
         card.setStyle("-fx-background-color: #ecf0f1; "
                 + "-fx-padding: 20; "
-                + "-fx-border-color: #272142; " // Utiliser la même couleur que le bouton
+                + "-fx-border-color: #272142; "
                 + "-fx-border-radius: 10; "
                 + "-fx-background-radius: 10; "
-                + "-fx-min-width: 500; " // Augmenter la largeur
-                + "-fx-min-height: 350; " // Augmenter la hauteur
+                + "-fx-min-width: 500; "
+                + "-fx-min-height: 350; "
                 + "-fx-max-width: 500; "
                 + "-fx-max-height: 350; "
                 + "-fx-alignment: CENTER;");
 
-        // ImageView pour l'image de la catégorie
         ImageView imageView = new ImageView(new Image("img/cat.png"));
         imageView.setFitWidth(350);
         imageView.setFitHeight(200);
 
-        // Nom de la catégorie
         Label nameLabel = new Label(categorie.getName());
         nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 18; -fx-text-alignment: center;");
 
-        // Description de la catégorie
         Label descriptionLabel = new Label(categorie.getDescription());
         descriptionLabel.setWrapText(true);
         descriptionLabel.setMaxWidth(350);
         descriptionLabel.setStyle("-fx-font-size: 14; -fx-text-alignment: center;");
 
-        // Bouton de détails
         Button detailsButton = new Button("Détails");
         detailsButton.setStyle(
                 "-fx-background-color: #272142; " +
@@ -137,10 +138,29 @@ public class ClientHome {
                         "-fx-border-radius: 20; " +
                         "-fx-background-radius: 20;"
         );
-        detailsButton.setOnAction(event -> showDetails("Catégorie : " + categorie.getName()));
+
+        detailsButton.setOnAction(event -> navigateToChallenges(categorie.getName()));
 
         card.getChildren().addAll(imageView, nameLabel, descriptionLabel, detailsButton);
         return card;
+    }
+
+    private void navigateToChallenges(String categoryName) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ChallengesList.fxml"));
+            Parent root = loader.load();
+
+            // Passer les données au contrôleur cible
+            ChallengesListController controller = loader.getController();
+            controller.setCategory(categoryName);
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Challenges pour " + categoryName);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void showDetails(String message) {

@@ -1,6 +1,8 @@
 package Controllers;
 
 import Entite.User;
+import Service.UserService;
+import Service.SessionManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -10,29 +12,30 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import Service.UserService;
-import javafx.scene.media.Media;
+import javafx.scene.media.*;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
-import java.net.URL;
+import javafx.stage.Stage;
+
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.io.File;
+
 public class LoginController {
+
     @FXML
     private TextField emailField;
 
     @FXML
     private PasswordField passwordField;
 
-    private UserService userService = new UserService();
-
     @FXML
     private MediaView mediaView;
-    private MediaPlayer mediaPlayer;
 
+    private MediaPlayer mediaPlayer;
+    private UserService userService = new UserService();
+
+    public static String loggedInUserEmail;
 
     @FXML
     private void handleLogin(ActionEvent event) {
@@ -40,9 +43,11 @@ public class LoginController {
         String password = passwordField.getText();
 
         try {
-            UserService userService = new UserService();
-            User user = userService.login(email, password);
+            User user = userService.login(email, password); // Vérifie les informations de connexion
             if (user != null) {
+                // Stocker l'ID et l'email de l'utilisateur dans le SessionManager
+                SessionManager.getInstance().setUserId(user.getId());
+                SessionManager.getInstance().setUserEmail(user.getEmail());
 
                 if ("admin".equals(user.getRole())) {
                     // Rediriger vers l'interface Admin
@@ -52,24 +57,21 @@ public class LoginController {
                     stage.setTitle("Admin Home");
                     stage.setScene(new Scene(root));
                     stage.show();
-                    // Fermer la fenêtre de connexion
                     ((Stage) emailField.getScene().getWindow()).close();
                 } else if ("client".equals(user.getRole())) {
                     // Rediriger vers l'interface Client avec ID et nom
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/ClientHome.fxml"));
                     Parent root = loader.load();
-                    // Passer l'ID et le nom de l'utilisateur au contrôleur client
                     ClientHome clientController = loader.getController();
                     clientController.setUserInfo(user.getEmail());
+
                     Stage stage = new Stage();
                     stage.setTitle("Client Home");
                     stage.setScene(new Scene(root));
                     stage.show();
-                    // Fermer la fenêtre de connexion
                     ((Stage) emailField.getScene().getWindow()).close();
                 }
             } else {
-                // Afficher une alerte d'erreur si les identifiants sont incorrects
                 showAlert("Erreur", "Identifiants invalides", Alert.AlertType.ERROR);
             }
         } catch (SQLException | IOException e) {
@@ -77,6 +79,7 @@ public class LoginController {
             showAlert("Erreur", "Une erreur s'est produite lors de la connexion.", Alert.AlertType.ERROR);
         }
     }
+
 
     @FXML
     public void openRegistrationForm(ActionEvent event) {
@@ -92,7 +95,6 @@ public class LoginController {
             showAlert("Erreur", "Problème lors de l'ouverture du formulaire d'inscription !", Alert.AlertType.ERROR);
         }
     }
-
 
     private void showAlert(String title, String message, Alert.AlertType alertType) {
         Alert alert = new Alert(alertType);
@@ -121,10 +123,8 @@ public class LoginController {
     }
 
     public void CloseFxml(AnchorPane mainpane) {
-
         Stage stage = (Stage) (mainpane.getScene().getWindow());
         stage.close();
-
     }
 
     @FXML
@@ -176,6 +176,5 @@ public class LoginController {
         resetStage.setScene(scene);
         resetStage.showAndWait();
     }
-
-
 }
+
